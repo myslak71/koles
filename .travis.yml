@@ -1,0 +1,14 @@
+---
+language: python
+sudo: required
+dist: xenial
+python: "3.7"
+cache: pip
+install:
+  - pip install -r requirements-dev.txt
+script:
+  - flake8 --exit-zero
+  - mypy .
+  - yamllint .
+  - pytest --cov=src tests/ --cov-branch
+after_success: coveralls
