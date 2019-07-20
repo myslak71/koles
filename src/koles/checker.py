@@ -15,10 +15,16 @@ class KolesChecker:
         self._pattern = '|'.join(self._get_bad_words())
 
     def _get_files_to_check(self) -> Generator:
-        """Get files to check basing on initialized path."""
-        for root, dirs, filenames in os.walk(self._path):
+        """
+        Get files to check basing on the initialized path.
+
+        Inaccessible files are omitted.
+        """
+        for root, _, filenames in os.walk(self._path):
             for file in filenames:
-                yield os.path.join(root, file)
+                full_file = os.path.join(root, file)
+                if os.access(full_file, os.R_OK):
+                    yield full_file
 
     def _get_bad_words(self) -> Set[str]:
         """Get a set of bad words."""
@@ -36,18 +42,20 @@ class KolesChecker:
     def _check_file(self, path: str) -> List[str]:
         """Check the file for inappropriate language and return existing errors."""
         errors = []
-        rude_filename = self._check_string(path)
+        file_error = self._check_string(path)
 
-        if rude_filename:
-            message = f'{path}: Filename contains bad language at position: {rude_filename}'
-            errors.append(message)
+        if file_error:
+            errors.append(
+                f'{path}: Filename contains bad language at position: {file_error}'
+            )
 
         with open(path, encoding='utf-8') as file:
-            for line_number, line in enumerate(file, 1):
-                error_positions = self._check_string(line)
-                if error_positions:
+            for number, line in enumerate(file, 1):
+                positions = self._check_string(line)
+                if positions:
                     errors.append(
-                        f'{path}:{line_number}: Inappropriate vocabulary found at position: {error_positions}'
+                        f'{path}:{number}: '
+                        f'Inappropriate vocabulary found at position: {positions}'
                     )
 
         return errors

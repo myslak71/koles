@@ -36,7 +36,7 @@ def run_koles(path: str):
         sys.stdout.write(koles_checker.check())
         return ReturnCode.no_errors.value
     except Exception as e:
-        print(e)
+        sys.stdout.write(e)
         return ReturnCode.errors_found.value
 
 
