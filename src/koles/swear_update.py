@@ -7,7 +7,7 @@ from urllib.request import Request, urlopen
 
 def generate_swear_file(filename: str) -> None:
     """
-    Collect fresh list of bad language and save it to a file.
+    Collect fresh list of the bad language and save it to a file.
 
     The words are fetched from https://www.noswearing.com/dictionary
     """
@@ -16,8 +16,7 @@ def generate_swear_file(filename: str) -> None:
 
     for url in urls:
         # set Firefox User-Agent header to don't be blocked be the server
-        request = Request(url, headers={
-            'User-Agent': 'Mozilla/5.0 Firefox/68.0'})
+        request = Request(url, headers={'User-Agent': 'Mozilla/5.0 Firefox/68.0'})
         with urlopen(request) as response:
             html = response.read().decode()
             matches = re.findall(r'name="(\w+)"><[/]a><b>', html)

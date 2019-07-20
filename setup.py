@@ -14,13 +14,12 @@ setup(
     name=name,
     packages=find_packages('src'),
     package_dir={'koles': 'src/koles'},
-    package_data={'koles': ['data/*.dat']},
+    package_data={'koles': ['data/swear_list/*.dat']},
     author='myslak71',
     author_email=' ',
     description='Bad language linter',
     long_description=long_description,
     python_requires=">=3.7",
-    include_package_data=True,
     entry_points={
         'console_scripts': [
             'koles = koles.cli:main',
