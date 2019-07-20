@@ -13,7 +13,7 @@ name = 'koles'
 setup(
     name=name,
     packages=find_packages('src'),
-    package_dir={'koles': 'src/koles'},
+    package_dir={'': 'src'},
     package_data={'koles': ['data/swear_list/*.dat']},
     author='myslak71',
     author_email=' ',
