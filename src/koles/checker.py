@@ -1,7 +1,7 @@
 """Koles checker module."""
 import os
 import re
-from typing import Set, Generator, List
+from typing import Set, Generator, List, Optional
 
 import pkg_resources
 
@@ -31,10 +31,12 @@ class KolesChecker:
         data = pkg_resources.resource_string(__name__, 'data/swear_list/english.dat')
         return set(data.decode().strip().split('\n'))
 
-    def _check_string(self, string: str) -> Generator[int, None, None]:
+    def _check_string(self, string: str) -> List[int]:
         """Return a generator of bad words starting positions."""
+        positions = []
         for m in re.finditer(f'(?=({self._pattern}))', string):
-            yield m.start()
+            positions.append(m.start())
+        return positions
 
     def _check_file_content(self, path: str) -> List[str]:
         """Check the file and return formatted errors."""
@@ -66,12 +68,15 @@ class KolesChecker:
             if file_errors:
                 errors += file_errors
         except UnicodeDecodeError as e:
-            return [f'{path}: File couldn\'t have been opened: {e}']
+            errors.append(f'{path}: File couldn\'t have been opened: {e}')
 
         return errors
 
-    def check(self) -> str:
+    def check(self) -> Optional[str]:
         """Check the given path and return formatted errors."""
+        if not self._pattern:
+            return ''
+
         errors: List[str] = []
         files_to_check = self._get_files_to_check()
 
@@ -80,7 +85,3 @@ class KolesChecker:
             errors += result
 
         return '\n'.join(errors)
-
-
-koles_checker = KolesChecker('/home/myslak/PycharmProjects/koles/venv')
-koles_checker.check()

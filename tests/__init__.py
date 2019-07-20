@@ -1,1 +1,1 @@
-"""TODO"""
+"""Koles test module."""

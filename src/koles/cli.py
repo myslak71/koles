@@ -33,7 +33,7 @@ def run_koles(path: str):
     """Run check on the given path."""
     # leaving this part without error handling just for development stage
     koles_checker = KolesChecker(path=path)
-    sys.stdout.write(koles_checker.check())
+    sys.stdout.write(koles_checker.check())  # type: ignore
     return ReturnCode.no_errors.value
 
 
