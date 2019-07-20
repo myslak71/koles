@@ -31,13 +31,10 @@ class readable_dir(argparse.Action):
 
 def run_koles(path: str):
     """Run check on the given path."""
-    try:
-        koles_checker = KolesChecker(path=path)
-        sys.stdout.write(koles_checker.check())
-        return ReturnCode.no_errors.value
-    except Exception as e:
-        print(e)
-        return ReturnCode.errors_found.value
+    # leaving this part without error handling just for development stage
+    koles_checker = KolesChecker(path=path)
+    sys.stdout.write(koles_checker.check())
+    return ReturnCode.no_errors.value
 
 
 def main():

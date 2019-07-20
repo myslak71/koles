@@ -5,6 +5,8 @@
 
 Watch your language young pal!
 
+Inaccessible files are omitted.
+
 ## Installation
 ```
 pip install git+https://github.com/myslak71/koles.git
