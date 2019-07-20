@@ -35,7 +35,8 @@ def run_koles(path: str):
         koles_checker = KolesChecker(path=path)
         sys.stdout.write(koles_checker.check())
         return ReturnCode.no_errors.value
-    except Exception:
+    except Exception as e:
+        print(e)
         return ReturnCode.errors_found.value
 
 
