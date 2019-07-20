@@ -1,4 +1,4 @@
-"""CLI module for koles"""
+"""CLI module for koles."""
 import argparse
 import os
 import sys
@@ -7,22 +7,22 @@ from koles.checker import KolesChecker
 
 
 class readable_dir(argparse.Action):
-    """TODO"""
+    """An action class for path argument validation."""
 
-    def __call__(self, parser, namespace, values, option_string=None):
-        """TODO"""
-        if not os.path.isdir(values):
-            raise argparse.ArgumentTypeError(f'Argument path: {values[0]} is not a valid path')
+    def __call__(self, parser, namespace, value, option_string=None):
+        """Raise an error if given path is not valid or cannot be accessed."""
+        if not os.path.isdir(value) and not os.path.isfile(value):
+            raise argparse.ArgumentTypeError(f'Argument path: {value} is not a valid path')
 
         # check if access to the file is granted
-        if os.access(values, os.R_OK):
-            setattr(namespace, self.dest, values)
+        if os.access(value, os.R_OK):
+            setattr(namespace, self.dest, value)
         else:
-            raise argparse.ArgumentTypeError(f'Argument path: {values[0]} is not a readable path')
+            raise argparse.ArgumentTypeError(f'Argument path: {value} is not a readable path')
 
 
 def run_koles(path: str):
-    """TODO"""
+    """Run check on the given path."""
     koles_checker = KolesChecker(path=path)
     return koles_checker.check()
 
