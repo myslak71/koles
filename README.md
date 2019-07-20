@@ -5,7 +5,7 @@
 
 Watch your language young pal!
 
-Inaccessible files are omitted.
+Inaccessible files or files without proper decoding are omitted.
 
 ## Installation
 ```

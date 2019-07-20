@@ -28,16 +28,13 @@ class KolesChecker:
 
     def _get_bad_words(self) -> Set[str]:
         """Get a set of bad words."""
-        data = pkg_resources.resource_string(__name__, 'data/english.dat')
+        data = pkg_resources.resource_string(__name__, 'data/swear_list/english.dat')
         return set(data.decode().strip().split('\n'))
 
-    def _check_string(self, string: str) -> List[int]:
-        """Return a list of bad words starting positions."""
-        nasty_positions = [
-            m.start() for m in re.finditer(f'(?=({self._pattern}))', string)
-        ]
-
-        return nasty_positions
+    def _check_string(self, string: str) -> Generator[int, None, None]:
+        """Return a generator of bad words starting positions."""
+        for m in re.finditer(f'(?=({self._pattern}))', string):
+            yield m.start()
 
     def _check_file_content(self, path: str) -> List[str]:
         """Check the file and return formatted errors."""
@@ -73,7 +70,7 @@ class KolesChecker:
 
         return errors
 
-    def check(self):
+    def check(self) -> str:
         """Check the given path and return formatted errors."""
         errors: List[str] = []
         files_to_check = self._get_files_to_check()
@@ -83,3 +80,7 @@ class KolesChecker:
             errors += result
 
         return '\n'.join(errors)
+
+
+koles_checker = KolesChecker('/home/myslak/PycharmProjects/koles/venv')
+koles_checker.check()
