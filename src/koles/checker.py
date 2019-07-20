@@ -33,10 +33,7 @@ class KolesChecker:
 
     def _check_string(self, string: str) -> List[int]:
         """Return a generator of bad words starting positions."""
-        positions = []
-        for m in re.finditer(f'(?=({self._pattern}))', string):
-            positions.append(m.start())
-        return positions
+        return [m.start() for m in re.finditer(f'(?=({self._pattern}))', string)]
 
     def _check_file_content(self, path: str) -> List[str]:
         """Check the file and return formatted errors."""
