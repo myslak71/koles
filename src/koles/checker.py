@@ -16,14 +16,13 @@ class KolesChecker:
         :param path: path to check
         """
         self._path = path
-        self.pattern = '|'.join(self._get_bad_words())
+        self._pattern = '|'.join(self._get_bad_words())
 
     def _get_files_to_check(self) -> Generator:
         """Get files to check basing on initialized path."""
-        if os.path.isdir(self._path):
-            for root, dirs, filenames in os.walk(self._path):
-                for file in filenames:
-                    yield os.path.join(root, file)
+        for root, dirs, filenames in os.walk(self._path):
+            for file in filenames:
+                yield os.path.join(root, file)
 
     def _get_bad_words(self) -> Set[str]:
         """Get a set of bad words."""
@@ -33,14 +32,14 @@ class KolesChecker:
     def _check_line(self, line: str) -> List[int]:
         """Return a list of bad words starting positions."""
         nasty_positions = [
-            m.start() for m in re.finditer(f'(?=({self.pattern}))', line)
+            m.start() for m in re.finditer(f'(?=({self._pattern}))', line)
         ]
         return nasty_positions
 
     def _check_file(self, path: str) -> List[Tuple[int, List[int]]]:
-        """Check file for inappropriate language and return existing errors."""
+        """Check the file for inappropriate language and return existing errors."""
         errors = []
-        print(path)
+
         with open(path, encoding='utf-8') as file:
             for line_number, line in enumerate(file, 1):
                 error_positions = self._check_line(line)
@@ -50,7 +49,7 @@ class KolesChecker:
         return errors
 
     def check(self):
-        """Check given path and return formatted errors."""
+        """Check the given path and return formatted errors."""
         errors = []
         files_to_check = self._get_files_to_check()
         for file in files_to_check:

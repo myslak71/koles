@@ -2,8 +2,16 @@
 import argparse
 import os
 import sys
+from enum import Enum
 
 from koles.checker import KolesChecker
+
+
+class ReturnCode(Enum):
+    """Class containing error codes."""
+
+    no_errors = 0
+    errors_found = 1
 
 
 class readable_dir(argparse.Action):
@@ -23,8 +31,12 @@ class readable_dir(argparse.Action):
 
 def run_koles(path: str):
     """Run check on the given path."""
-    koles_checker = KolesChecker(path=path)
-    return koles_checker.check()
+    try:
+        koles_checker = KolesChecker(path=path)
+        sys.stdout.write(koles_checker.check())
+        return ReturnCode.no_errors.value
+    except Exception:
+        return ReturnCode.errors_found.value
 
 
 def main():
