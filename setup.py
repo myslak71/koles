@@ -1,4 +1,4 @@
-"""TODO"""
+"""Koles package installation setup."""
 import os
 
 from setuptools import setup, find_packages
