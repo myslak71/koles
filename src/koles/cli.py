@@ -14,8 +14,8 @@ class ReturnCode(Enum):
     errors_found = 1
 
 
-class readable_dir(argparse.Action):
-    """An action class for path argument validation."""
+class accessible_dir(argparse.Action):
+    """An action class for the path argument validation."""
 
     def __call__(self, parser, namespace, value, option_string=None):
         """Raise an error if given path is not valid or cannot be accessed."""
@@ -40,7 +40,7 @@ def run_koles(path: str):
 def main():
     """Run koles as a script."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('path', action=readable_dir)
+    parser.add_argument('path', action=accessible_dir)
     args = parser.parse_args()
 
     try:
