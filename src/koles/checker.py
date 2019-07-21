@@ -1,7 +1,7 @@
 """Koles checker module."""
 import os
 import re
-from typing import Set, Generator, List, Optional
+from typing import Set, Generator, List, Optional, Tuple
 
 import pkg_resources
 
@@ -31,9 +31,25 @@ class KolesChecker:
         data = pkg_resources.resource_string(__name__, 'data/swear_list/english.dat')
         return set(data.decode().strip().split('\n'))
 
-    def _check_string(self, string: str) -> List[int]:
+    def _check_string(self, string: str) -> List[Tuple[int, str]]:
         """Return a generator of bad words starting positions."""
-        return [m.start() for m in re.finditer(f'(?=({self._pattern}))', string)]
+        if self._pattern == '':
+            return []
+
+        regex = re.compile(f'(?=({self._pattern}))', flags=re.IGNORECASE)
+
+        return [
+            (match.start(), match.group(1))
+            for match in regex.finditer(string)
+        ]
+
+    @staticmethod
+    def _format_matches(matches):
+        """Format matches and censor swears."""
+        result = ''
+        for index, swear in matches:
+            result += f'{index}: {swear[0]+"*"*(len(swear)-1)}, '
+        return result[:-2]
 
     def _check_file_content(self, path: str) -> List[str]:
         """Check the file and return formatted errors."""
@@ -41,11 +57,12 @@ class KolesChecker:
 
         with open(path, encoding='utf-8') as file:
             for line_number, line in enumerate(file, 1):
-                positions = self._check_string(line)
-                if positions:
+                raw_matches = self._check_string(line)
+                if raw_matches:
+                    matches = self._format_matches(raw_matches)
                     errors.append(
                         f'{path}:{line_number}: '
-                        f'Inappropriate vocabulary found at position: {positions}'
+                        f'Inappropriate vocabulary found: {matches}'
                     )
 
         return errors
@@ -56,8 +73,9 @@ class KolesChecker:
         filename = self._check_string(path)
 
         if filename:
+            matches = self._format_matches(filename)
             errors.append(
-                f'{path}: Filename contains bad language at position: {filename}'
+                f'{path}: Filename contains bad language: {matches}'
             )
 
         try:
