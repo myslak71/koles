@@ -12,7 +12,10 @@ def generate_swear_file(filename: str) -> None:
     The words are fetched from https://www.noswearing.com/dictionary
     """
     swear_list: List[str] = []
-    urls = [f'https://www.noswearing.com/dictionary/{letter}' for letter in string.ascii_lowercase]
+    server_url = 'https://www.noswearing.com/dictionary/'
+    urls = (
+        f'{server_url}{letter}' for letter in string.ascii_lowercase
+    )
 
     for url in urls:
         # set Firefox User-Agent header to don't be blocked be the server
