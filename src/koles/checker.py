@@ -4,14 +4,17 @@ import re
 from typing import Set, Generator, List, Optional, Tuple
 
 import pkg_resources
+from koles.config import KolesConfig
 
 
 class KolesChecker:
     """A koles checker class."""
 
-    def __init__(self, path: str) -> None:
+    swear_list_file = 'data/swear_list/english.dat'
+
+    def __init__(self, config: KolesConfig) -> None:
         """Initialize path and word matching pattern."""
-        self._path = path
+        self._path = config.path
         self._pattern = '|'.join(self._get_bad_words())
 
     def _get_files_to_check(self) -> Generator:
@@ -28,11 +31,11 @@ class KolesChecker:
 
     def _get_bad_words(self) -> Set[str]:
         """Get a set of bad words."""
-        data = pkg_resources.resource_string(__name__, 'data/swear_list/english.dat')
+        data = pkg_resources.resource_string(__name__, self.swear_list_file)
         return set(data.decode().strip().split('\n'))
 
-    def _check_string(self, string: str) -> List[Tuple[int, str]]:
-        """Return a generator of bad words starting positions."""
+    def _check_row(self, string: str) -> List[Tuple[int, str]]:
+        """Return a List containing a bad word and its position."""
         if self._pattern == '':
             return []
 
@@ -49,7 +52,7 @@ class KolesChecker:
         result = ''
         for index, swear in matches:
             result += f'{index}: {swear[0]+"*"*(len(swear)-1)}, '
-        return result[:-2]
+        return result[:-2]  # remove last comma and space
 
     def _check_file_content(self, path: str) -> List[str]:
         """Check the file and return formatted errors."""
@@ -57,7 +60,7 @@ class KolesChecker:
 
         with open(path, encoding='utf-8') as file:
             for line_number, line in enumerate(file, 1):
-                raw_matches = self._check_string(line)
+                raw_matches = self._check_row(line)
                 if raw_matches:
                     matches = self._format_matches(raw_matches)
                     errors.append(
@@ -70,7 +73,7 @@ class KolesChecker:
     def _check_file(self, path: str) -> List[str]:
         """Check the file for inappropriate language and return errors."""
         errors = []
-        filename = self._check_string(path)
+        filename = self._check_row(path)
 
         if filename:
             matches = self._format_matches(filename)
