@@ -8,8 +8,8 @@ install:
   - pip install -r requirements-dev.txt
   - pip install .
 script:
-  - flake8 --exit-zero
-  - mypy .
-  - yamllint .
-  - pytest --cov=koles tests/ --cov-branch
+  - make flake8
+  - make mypy
+  - make yamllint
+  - make unittests
 after_success: coveralls
