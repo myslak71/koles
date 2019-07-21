@@ -8,7 +8,7 @@ from koles.checker import KolesChecker
 
 @mock.patch('koles.checker.os.walk')
 @mock.patch('koles.checker.os.access')
-def test_get_files_to_check(access_mock, walk_mock):
+def test_get_files_to_check(access_mock, walk_mock, koles_checker_fixture):
     """Test that the function walks and gather filenames properly."""
     walk_mock.return_value = (
         ('root', ['dir'], ['file1', 'file2']),
@@ -16,8 +16,7 @@ def test_get_files_to_check(access_mock, walk_mock):
         ('root/sub_dir', [], ['file4', 'file5']),
     )
     access_mock.side_effect = 4 * [True] + [False]
-    koles_checker = KolesChecker(path="test_path")
-    result = [*koles_checker._get_files_to_check()]
+    result = [*koles_checker_fixture._get_files_to_check()]
     expected_result = [
         'root/file1', 'root/file2', 'root/dir/file3', 'root/sub_dir/file4'
     ]
@@ -26,11 +25,10 @@ def test_get_files_to_check(access_mock, walk_mock):
 
 
 @mock.patch('koles.checker.pkg_resources.resource_string')
-def test_get_bad_words(resource_string_mock):
+def test_get_bad_words(resource_string_mock, koles_checker_fixture):
     """Test that the function returns set of bad words."""
     resource_string_mock.return_value = b'Mike D\nMCA\nAd-Rock'
-    koles_checker = KolesChecker(path="test_path")
-    result = koles_checker._get_bad_words()
+    result = koles_checker_fixture._get_bad_words()
 
     assert result == {'MCA', 'Ad-Rock', 'Mike D'}
 
@@ -79,24 +77,22 @@ def test_get_bad_words(resource_string_mock):
                 [(0, 'ABCD'), (2, 'CD'), (4, 'AB')]
         ),
 ))
-def test_check_string(pattern, string, expected_result):
+def test_check_row(pattern, string, expected_result, koles_checker_fixture):
     """Test that check_string returns appropriate value for given pattern and string."""
-    koles_checker = KolesChecker(path="test_path")
-    koles_checker._pattern = pattern
-    result = koles_checker._check_string(string)
+    koles_checker_fixture._pattern = pattern
+    result = koles_checker_fixture._check_row(string)
 
     assert [*result] == expected_result
 
 
-@mock.patch('koles.checker.KolesChecker._check_string')
-def test_check_file_content(_check_string_mock):
+@mock.patch('koles.checker.KolesChecker._check_row')
+def test_check_file_content(_check_row_mock, koles_checker_fixture):
     """Test that the function returns valid error messages for clean and dirty rows."""
-    koles_checker = KolesChecker(path="test_path")
-    _check_string_mock.side_effect = [[(1, 'Mike D'), (3, 'MCA')], [], [(3, 'MCA')]]
+    _check_row_mock.side_effect = [[(1, 'Mike D'), (3, 'MCA')], [], [(3, 'MCA')]]
     read_data = 'Mike D\nMCA\nAd-Rock'
 
     with mock.patch("builtins.open", mock_open(read_data=read_data)):
-        result = koles_checker._check_file_content('test_path')
+        result = koles_checker_fixture._check_file_content('test_path')
 
     expected_result = [
         'test_path:1: Inappropriate vocabulary found: 1: M*****, 3: M**',
@@ -106,7 +102,7 @@ def test_check_file_content(_check_string_mock):
     assert result == expected_result
 
 
-@pytest.mark.parametrize('_check_string_value, _check_file_content_value, expected_result', (
+@pytest.mark.parametrize('_check_row_value, _check_file_content_value, expected_result', (
 
         # Case 1: Clean filename, clean content
         (
@@ -174,20 +170,20 @@ def test_check_file_content(_check_string_mock):
 
 ))
 @mock.patch('koles.checker.KolesChecker._check_file_content')
-@mock.patch('koles.checker.KolesChecker._check_string')
+@mock.patch('koles.checker.KolesChecker._check_row')
 def test_check_file(
-        _check_string_mock,
+        _check_row_mock,
         _check_file_content_mock,
-        _check_string_value,
+        _check_row_value,
         _check_file_content_value,
-        expected_result
+        expected_result,
+        koles_checker_fixture
 ):
     """Test that the function returns appropriate error messages."""
-    koles_checker = KolesChecker(path="test_path")
-    _check_string_mock.return_value = _check_string_value
+    _check_row_mock.return_value = _check_row_value
     _check_file_content_mock.side_effect = _check_file_content_value
 
-    result = koles_checker._check_file('test_path')
+    result = koles_checker_fixture._check_file('test_path')
 
     assert result == expected_result
 
@@ -238,14 +234,14 @@ def test_check(
         pattern,
         _check_file_mock_value,
         _get_files_to_check_value,
-        expected_result
+        expected_result,
+        koles_checker_fixture
 ):
     """Test that the function return appropriate error messages."""
-    koles_checker = KolesChecker(path="test_path")
     _check_file_mock.side_effect = _check_file_mock_value
     _get_files_to_check_mock.return_value = _get_files_to_check_value
 
-    koles_checker._pattern = pattern
-    result = koles_checker.check()
+    koles_checker_fixture._pattern = pattern
+    result = koles_checker_fixture.check()
 
     assert result == expected_result

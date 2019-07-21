@@ -33,3 +33,14 @@ koles .
 ./koles/checker.py:40: Inappropriate vocabulary found at positions: [66]
 ./koles/checker.py:58: Inappropriate vocabulary found at positions: [40]
 ```
+
+## Development notes
+`make lint` - runs all linters
+
+`make flake8` - runs flake8
+
+`make unittests` - runs unittests with coverage report and -s flag
+
+`make mypy` - runs mypy
+
+`make yamllint` - runs yamllint
