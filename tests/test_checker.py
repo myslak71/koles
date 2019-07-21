@@ -92,6 +92,7 @@ def test_check_string(pattern, string, expected_result):
 def test_check_file_content(_check_string_mock):
     """Test that the function returns valid error messages for clean and dirty rows."""
     koles_checker = KolesChecker(path="test_path")
+    _check_string_mock.side_effect = [[(1, 'Mike D'), (3, 'MCA')], [], [(3, 'MCA')]]
     read_data = 'Mike D\nMCA\nAd-Rock'
 
     with mock.patch("builtins.open", mock_open(read_data=read_data)):
@@ -156,6 +157,7 @@ def test_check_file_content(_check_string_mock):
                     'test_path:1: Inappropriate vocabulary found: 6: B***********',
                     'test_path:3: Inappropriate vocabulary found: 6: M**'
                 ],
+
         ),
 
         # Case 6: Dirty filename, UnicodeDecodeError
