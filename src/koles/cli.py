@@ -43,6 +43,9 @@ def main():
     parser.add_argument('path', action=accessible_dir)
     args = parser.parse_args()
 
+    run_dir = os.getcwd()
+    sys.stdout.write(f'Running Koles from: {run_dir}')
+
     try:
         sys.exit(run_koles(args.path))
     except KeyboardInterrupt:

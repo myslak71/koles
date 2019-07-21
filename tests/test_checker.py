@@ -39,16 +39,16 @@ def test_get_bad_words(resource_string_mock):
 
         # Case 1: Multiple overlapping patterns
         (
-                '(?=(abcd|ab|abc|cd))',
+                'abcd|ab|abc|cd',
                 'abcdab',
-                [0, 2, 4]
+                [(0, 'abcd'), (2, 'cd'), (4, 'ab')]
         ),
 
         # Case 2: Single non-overlapping pattern
         (
-                '(?=(ab))',
+                'ab',
                 'abcdab',
-                [0, 4]
+                [(0, 'ab'), (4, 'ab')]
         ),
 
         # Case 3: Empty string
@@ -58,18 +58,25 @@ def test_get_bad_words(resource_string_mock):
                 []
         ),
 
-        # Case 3: Empty pattern
+        # Case 4: Empty pattern
         (
                 '',
                 'abcdab',
-                [*range(7)]
+                []
         ),
 
-        # Case 4: Empty string and pattern
+        # Case 6: Empty string and pattern
         (
                 '',
                 '',
-                [0]
+                []
+        ),
+
+        # Case 7: Uppercase string
+        (
+                'abcd|ab|abc|cd',
+                'ABCDAB',
+                [(0, 'ABCD'), (2, 'CD'), (4, 'AB')]
         ),
 ))
 def test_check_string(pattern, string, expected_result):
@@ -85,15 +92,14 @@ def test_check_string(pattern, string, expected_result):
 def test_check_file_content(_check_string_mock):
     """Test that the function returns valid error messages for clean and dirty rows."""
     koles_checker = KolesChecker(path="test_path")
-    _check_string_mock.side_effect = [[1, 3], [], [3]]
     read_data = 'Mike D\nMCA\nAd-Rock'
 
     with mock.patch("builtins.open", mock_open(read_data=read_data)):
         result = koles_checker._check_file_content('test_path')
 
     expected_result = [
-        'test_path:1: Inappropriate vocabulary found at position: [1, 3]',
-        'test_path:3: Inappropriate vocabulary found at position: [3]'
+        'test_path:1: Inappropriate vocabulary found: 1: M*****, 3: M**',
+        'test_path:3: Inappropriate vocabulary found: 3: M**'
     ]
 
     assert result == expected_result
@@ -124,7 +130,6 @@ def test_check_file_content(_check_string_mock):
         # Case 3: Clean filename, UnicodeDecodeError
         (
                 [],
-
                 UnicodeDecodeError('test_codec', b'\x00\x00', 1, 2, 'unicode_decode_error'),
                 [
                     'test_path: File couldn\'t have been opened: \'test_codec\' codec '
@@ -134,34 +139,31 @@ def test_check_file_content(_check_string_mock):
 
         # Case 4: Dirty filename, clean content
         (
-                [1, 3],
+                [(1, 'Mike D'), (3, 'Ad-Rock')],
                 [[]],
-                [f'test_path: Filename contains bad language at position: [1, 3]'],
-
+                [f'test_path: Filename contains bad language: 1: M*****, 3: A******'],
         ),
 
         # Case 5: Dirty filename, dirty content
         (
-                [1, 3],
+                [(1, 'Ad-Rock'), (3, 'MCA')],
                 [[
-                    'test_path:1: Inappropriate vocabulary found at position: [1, 3]',
-                    'test_path:3: Inappropriate vocabulary found at position: [3]'
+                    'test_path:1: Inappropriate vocabulary found: 6: B***********',
+                    'test_path:3: Inappropriate vocabulary found: 6: M**'
                 ]],
-                [f'test_path: Filename contains bad language at position: [1, 3]',
-
-                 'test_path:1: Inappropriate vocabulary found at position: [1, 3]',
-                 'test_path:3: Inappropriate vocabulary found at position: [3]'
-
-                 ],
-
+                [
+                    'test_path: Filename contains bad language: 1: A******, 3: M**',
+                    'test_path:1: Inappropriate vocabulary found: 6: B***********',
+                    'test_path:3: Inappropriate vocabulary found: 6: M**'
+                ],
         ),
 
         # Case 6: Dirty filename, UnicodeDecodeError
         (
-                [1, 3],
+                [(1, 'Mike D'), (3, 'MCA')],
                 UnicodeDecodeError('test_codec', b'\x00\x00', 1, 2, 'unicode_decode_error'),
                 [
-                    f'test_path: Filename contains bad language at position: [1, 3]',
+                    f'test_path: Filename contains bad language: 1: M*****, 3: M**',
                     'test_path: File couldn\'t have been opened: \'test_codec\' codec '
                     'can\'t decode byte 0x00 in position 1: unicode_decode_error',
                 ]
