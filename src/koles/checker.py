@@ -100,4 +100,3 @@ class KolesChecker:
             errors += result
 
         return '\n'.join(errors)
-
