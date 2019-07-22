@@ -1,7 +1,9 @@
 # koles
 
-[![Build Status](https://travis-ci.com/myslak71/koles.svg?token=s1Zd7YYn4fqxstysFsVc&branch=master)](https://travis-ci.com/myslak71/koles)
+[![Build Status](https://travis-ci.org/myslak71/koles.svg?branch=develop)](https://travis-ci.org/myslak71/koles)
+[![Coverage Status](https://coveralls.io/repos/github/myslak71/koles/badge.svg?branch=develop)](https://coveralls.io/github/myslak71/koles?branch=develop)
 ![image](https://img.shields.io/badge/python-3.7-blue.svg)
+
 
 Watch your language young pal!
 
