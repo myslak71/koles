@@ -7,7 +7,7 @@ from urllib.request import Request, urlopen
 
 def generate_swear_file(filename: str) -> None:
     """
-    Collect fresh list of the bad language and save it to a file.
+    Collect fresh list of the bad language and save it to the file.
 
     The words are fetched from https://www.noswearing.com/dictionary
     """

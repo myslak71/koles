@@ -31,7 +31,7 @@ class AccessibleDir(argparse.Action):
 
 
 def run_koles(path: str, run_dir: str) -> int:
-    """Run check on the given path."""
+    """Run check for the given path."""
     # leaving this part without error handling just for development stage
     config = KolesConfig(path=path, run_dir=run_dir)
     koles_checker = KolesChecker(config)
