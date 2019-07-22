@@ -14,7 +14,7 @@ class KolesChecker:
 
     def __init__(self, config: KolesConfig) -> None:
         """Initialize path and word matching pattern."""
-        self._path = config.path
+        self._config = config
         self._pattern = '|'.join(self._get_bad_words())
 
     def _get_files_to_check(self) -> Generator:
@@ -23,7 +23,7 @@ class KolesChecker:
 
         Inaccessible files are omitted.
         """
-        for root, _, filenames in os.walk(self._path):
+        for root, _, filenames in os.walk(self._config.path):
             for file in filenames:
                 full_file = os.path.join(root, file)
                 if os.access(full_file, os.R_OK):
@@ -51,7 +51,7 @@ class KolesChecker:
         """Format matches and censor swears."""
         result = ''
         for index, swear in matches:
-            result += f'{index}: {swear[0]+"*"*(len(swear)-1)}, '
+            result += f'{index}: {swear[0] + "*" * (len(swear) - 1)}, '
         return result[:-2]  # remove last comma and space
 
     def _check_file_content(self, path: str) -> List[str]:
