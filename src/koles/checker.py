@@ -52,6 +52,7 @@ class KolesChecker:
         result = ''
         for index, swear in matches:
             result += f'{index}: {swear[0] + "*" * (len(swear) - 1)}, '
+            
         return result[:-2]  # remove last comma and space
 
     def _check_file_content(self, path: str) -> List[str]:
