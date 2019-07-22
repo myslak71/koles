@@ -5,18 +5,18 @@ from collections import UserDict
 from koles.errors import OptionValidationError
 
 DEFAULT_CONFIG = {
-    "ignore-shorties": None,
+    'ignore-shorties': 0,
 }
 
 OPTION_VALIDATION_MAP = {
-    "ignore-shorties": None,
+    'ignore-shorties': None,
 }
 
 
 class KolesConfig(UserDict):
     """Koles config class."""
 
-    ALLOW_CONFIG_FILENAMES = ('setup.cfg',)
+    ALLOWED_CONFIG_FILENAMES = ('setup.cfg',)
     DEFAULT_CONFIG = DEFAULT_CONFIG
 
     def __init__(self, path, run_dir: str) -> None:
@@ -28,11 +28,15 @@ class KolesConfig(UserDict):
     def _discover_config_file_path(self) -> str:
         """Discover config file and return its path."""
         #  config filename is hard-coded for now
-        return f'{self._run_dir}/{self.ALLOW_CONFIG_FILENAMES[0]}'
+        return f'{self._run_dir}/{self.ALLOWED_CONFIG_FILENAMES[0]}'
 
     def _get_file_config(self) -> dict:
         """Set config."""
         path = self._discover_config_file_path()
+
+        if not path:
+            return self.DEFAULT_CONFIG
+
         config = configparser.ConfigParser()
         config.read(path)
 
@@ -41,12 +45,12 @@ class KolesConfig(UserDict):
         try:
             options = config['koles'].items()
         except KeyError:
-            return result_dict
+            return self.DEFAULT_CONFIG
 
         for key, value in options:
             try:
                 self._validate_option(key, value)
-                result_dict.update({key: value})
+                result_dict.update({key: int(value)})
             except OptionValidationError:
                 pass
 
