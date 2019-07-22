@@ -3,7 +3,6 @@ from unittest import mock
 from unittest.mock import mock_open
 
 import pytest
-from koles.checker import KolesChecker
 
 
 @mock.patch('koles.checker.os.walk')
@@ -29,8 +28,9 @@ def test_get_bad_words(resource_string_mock, koles_checker_fixture):
     """Test that the function returns set of bad words."""
     resource_string_mock.return_value = b'Mike D\nMCA\nAd-Rock'
     result = koles_checker_fixture._get_bad_words()
+    expected_result = (word for word in ('Mike D', 'MCA', 'Ad-Rock'))
 
-    assert result == {'MCA', 'Ad-Rock', 'Mike D'}
+    assert all(a == b for a, b in zip(result, expected_result))
 
 
 @pytest.mark.parametrize('pattern, string, expected_result', (

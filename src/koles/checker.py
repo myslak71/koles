@@ -1,7 +1,7 @@
 """Koles checker module."""
 import os
 import re
-from typing import Set, Generator, List, Optional, Tuple
+from typing import Generator, List, Optional, Tuple
 
 import pkg_resources
 from koles.config import KolesConfig
@@ -15,7 +15,7 @@ class KolesChecker:
     def __init__(self, config: KolesConfig) -> None:
         """Initialize path and word matching pattern."""
         self._config = config
-        self._pattern = '|'.join(self._get_bad_words())
+        self._pattern = frozenset('|'.join(self._get_bad_words()))
 
     def _get_files_to_check(self) -> Generator:
         """
@@ -29,10 +29,13 @@ class KolesChecker:
                 if os.access(full_file, os.R_OK):
                     yield full_file
 
-    def _get_bad_words(self) -> Set[str]:
-        """Get a set of bad words."""
+    def _get_bad_words(self) -> Generator[str, None, None]:
+        """Get a generator of bad words."""
         data = pkg_resources.resource_string(__name__, self.swear_list_file)
-        return set(data.decode().strip().split('\n'))
+        return (
+            word for word in data.decode().strip().split('\n')
+            if len(word) > self._config['ignore-shorties']
+        )
 
     def _check_row(self, string: str) -> List[Tuple[int, str]]:
         """Return a List containing a bad word and its position."""

@@ -21,13 +21,17 @@ class AccessibleDir(argparse.Action):
     def __call__(self, parser, namespace, value, option_string=None) -> None:
         """Raise an error if given path is not valid or cannot be accessed."""
         if not os.path.isdir(value) and not os.path.isfile(value):
-            raise argparse.ArgumentTypeError(f'Argument path: {value} is not a valid path')
+            raise argparse.ArgumentTypeError(
+                f'Argument path: {value} is not a valid path'
+            )
 
         # check if access to the file is granted
         if os.access(value, os.R_OK):
             setattr(namespace, self.dest, value)
         else:
-            raise argparse.ArgumentTypeError(f'Argument path: {value} is not a readable path')
+            raise argparse.ArgumentTypeError(
+                f'Argument path: {value} is not a readable path'
+            )
 
 
 def run_koles(path: str, run_dir: str) -> int:
