@@ -38,7 +38,7 @@ class KolesChecker:
         )
 
     def _check_row(self, string: str) -> List[Tuple[int, str]]:
-        """Return a List containing a bad word and its position."""
+        """Return a list containing a bad word and its position."""
         if self._pattern == '':
             return []
 
