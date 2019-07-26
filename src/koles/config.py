@@ -25,7 +25,7 @@ class KolesConfig(UserDict):
         """Set path and config."""
         self.path = cli_args.path
         self._cli_args = {
-            key: value for key, value in vars(cli_args).items()
+            key.replace('_', '-'): value for key, value in vars(cli_args).items()
             if key != 'path' and value is not None
         }
         self._run_dir = run_dir
@@ -35,7 +35,7 @@ class KolesConfig(UserDict):
     def _discover_config_file_path(self) -> str:
         """Discover config file and return its path."""
         #  config filename is hard-coded for now
-        return None
+        return f'{self._run_dir}/setup.cfg'
 
     def _get_file_config(self) -> dict:
         """Set config."""

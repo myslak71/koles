@@ -1,4 +1,4 @@
-# linters
+# Linters
 ########################
 flake8==3.7.8
 flake8-docstrings==1.3.0
@@ -8,7 +8,7 @@ yamllint==1.16.0
 # flake8 dependency, can be removed after https://gitlab.com/pycqa/flake8-docstrings/issues/36 is resolved
 pydocstyle==3.0.0
 
-# testing purposes
+# Testing purposes
 #######################
 pytest==5.0.1
 pytest-cov==2.7.1
